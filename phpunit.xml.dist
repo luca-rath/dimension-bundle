@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit colors="true" bootstrap="Tests/bootstrap.php">
+    <testsuites>
+        <testsuite name="LRHDimensionBundle Unit Test Suite">
+            <directory>./Tests/Unit</directory>
+        </testsuite>
+        <testsuite name="LRHDimensionBundle Functional Test Suite">
+            <directory>./Tests/Functional</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist addUncoveredFilesFromWhitelist="true">
+            <directory>.</directory>
+            <exclude>
+                <directory>Resources/</directory>
+                <directory>Tests/</directory>
+                <directory>vendor/</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+
+    <php>
+        <server name="SYMFONY_PHPUNIT_VERSION" value="8.3"/>
+        <env name="KERNEL_CLASS" value="LRH\Bundle\DimensionBundle\Tests\Application\Kernel"/>
+        <env name="APP_ENV" value="test" force="true"/>
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak"/>
+        <server name="SYMFONY_PHPUNIT_REMOVE" value="symfony/yaml"/>
+    </php>
+</phpunit>
