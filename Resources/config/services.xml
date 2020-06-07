@@ -4,5 +4,75 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <!-- MetadataLoader -->
+        <service id="LRH\Bundle\DimensionBundle\Dimension\Infrastructure\Doctrine\MetadataLoader">
+            <tag name="doctrine.event_subscriber"/>
+        </service>
+
+        <!-- DimensionMerger -->
+        <service id="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionMerger\DimensionMerger">
+            <argument type="tagged" tag="lrh_dimension.merger"/>
+        </service>
+        <service id="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionMerger\DimensionMergerInterface"
+                 alias="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionMerger\DimensionMerger"/>
+
+        <!-- DimensionRepository -->
+        <service id="LRH\Bundle\DimensionBundle\Dimension\Application\Repository\DimensionRepository">
+            <argument type="service" id="doctrine.orm.entity_manager"/>
+            <argument type="service" id="LRH\Bundle\DimensionBundle\Dimension\Domain\Factory\DimensionFactoryInterface"/>
+        </service>
+        <service id="LRH\Bundle\DimensionBundle\Dimension\Domain\Repository\DimensionRepositoryInterface"
+                 alias="LRH\Bundle\DimensionBundle\Dimension\Application\Repository\DimensionRepository"/>
+
+        <!-- DimensionFactory -->
+        <service id="LRH\Bundle\DimensionBundle\Dimension\Application\Factory\DimensionFactory"/>
+        <service id="LRH\Bundle\DimensionBundle\Dimension\Domain\Factory\DimensionFactoryInterface"
+                 alias="LRH\Bundle\DimensionBundle\Dimension\Application\Factory\DimensionFactory"/>
+
+        <!-- DimensionCollectionFactory -->
+        <service id="LRH\Bundle\DimensionBundle\Dimension\Application\Factory\DimensionCollectionFactory">
+            <argument type="service" id="LRH\Bundle\DimensionBundle\Dimension\Domain\Repository\DimensionRepositoryInterface"/>
+        </service>
+        <service id="LRH\Bundle\DimensionBundle\Dimension\Domain\Factory\DimensionCollectionFactoryInterface"
+                 alias="LRH\Bundle\DimensionBundle\Dimension\Application\Factory\DimensionCollectionFactory"/>
+
+        <!-- DimensionResolver -->
+        <service id="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionResolver\DimensionResolver">
+            <argument type="service" id="LRH\Bundle\DimensionBundle\Dimension\Domain\Factory\DimensionCollectionFactoryInterface"/>
+            <argument type="service" id="LRH\Bundle\DimensionBundle\Dimension\Domain\Factory\DimensionFactoryInterface"/>
+            <argument type="service" id="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionMerger\DimensionMergerInterface"/>
+        </service>
+        <service id="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionResolver\DimensionResolverInterface"
+                 alias="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionResolver\DimensionResolver"/>
+
+        <!-- DimensionPersister -->
+        <service id="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionPersister\DimensionPersister">
+            <argument type="service" id="LRH\Bundle\DimensionBundle\Dimension\Domain\Factory\DimensionCollectionFactoryInterface"/>
+            <argument type="service" id="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionMerger\DimensionMergerInterface"/>
+        </service>
+        <service id="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionPersister\DimensionPersisterInterface"
+                 alias="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionPersister\DimensionPersister"/>
+
+        <!-- DimensionCopier -->
+        <service id="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionCopier\DimensionCopier">
+            <argument type="service" id="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionPersister\DimensionPersisterInterface"/>
+        </service>
+        <service id="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionCopier\DimensionCopierInterface"
+                 alias="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionCopier\DimensionCopier"/>
+
+        <!-- DimensionMover -->
+        <service id="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionMover\DimensionMover">
+            <argument type="service" id="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionCopier\DimensionCopierInterface"/>
+            <argument type="service" id="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionRemover\DimensionRemoverInterface"/>
+        </service>
+        <service id="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionMover\DimensionMoverInterface"
+                 alias="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionMover\DimensionMover"/>
+
+        <!-- DimensionRemover -->
+        <service id="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionRemover\DimensionRemover">
+            <argument type="service" id="LRH\Bundle\DimensionBundle\Dimension\Domain\Repository\DimensionRepositoryInterface"/>
+        </service>
+        <service id="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionRemover\DimensionRemoverInterface"
+                 alias="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionRemover\DimensionRemover"/>
     </services>
 </container>

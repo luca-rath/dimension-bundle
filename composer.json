@@ -5,15 +5,18 @@
     "description": "Adds dimensioning to doctrine entities.",
     "require": {
         "php": "^7.4",
+        "ext-json": "*",
         "doctrine/orm": "^2.7",
         "symfony/config": "^4.4 | ^5.0",
         "symfony/dependency-injection": "^4.4 | ^5.0",
-        "symfony/messenger": "^4.4 | ^5.0",
-        "webmozart/assert": "^1.3"
+        "symfony/http-kernel": "^4.4 | ^5.0",
+        "symfony/property-access": "^4.4 | ^5.0",
+        "symfony/uid": "^5.1",
+        "webmozart/assert": "^1.8"
     },
     "require-dev": {
         "doctrine/doctrine-bundle": "^2.1",
-        "friendsofphp/php-cs-fixer": "^2.12",
+        "friendsofphp/php-cs-fixer": "^2.16",
         "jangregor/phpstan-prophecy": "^0.5",
         "phpstan/phpstan": "^0.12",
         "phpstan/phpstan-doctrine": "^0.12",
@@ -48,7 +51,7 @@
             "@lint-schema",
             "@php-cs",
             "@phpstan",
-            "@deptract"
+            "@deptrac"
         ],
         "lint-composer": "@composer validate --strict",
         "lint-yaml": "Tests/Application/bin/console lint:yaml Resources/config Tests/Application/config",

@@ -24,6 +24,7 @@ class Kernel extends SymfonyKernel
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
         $loader->load($this->getProjectDir() . '/config/config.yaml');
+        $loader->load($this->getProjectDir() . '/config/services.yaml');
     }
 
     public function getProjectDir(): string

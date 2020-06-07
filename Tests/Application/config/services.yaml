@@ -1,0 +1,19 @@
+services:
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    LRH\Bundle\DimensionBundle\Tests\Application\Merger\ExampleMerger:
+        tags: ['lrh_dimension.merger']
+
+    LRH\Bundle\DimensionBundle\Dimension\Application\DimensionPersister\DimensionPersisterInterface:
+        alias: LRH\Bundle\DimensionBundle\Dimension\Application\DimensionPersister\DimensionPersister
+        public: true
+
+    LRH\Bundle\DimensionBundle\Dimension\Application\DimensionResolver\DimensionResolverInterface:
+        alias: LRH\Bundle\DimensionBundle\Dimension\Application\DimensionResolver\DimensionResolver
+        public: true
+
+    LRH\Bundle\DimensionBundle\Dimension\Application\DimensionCopier\DimensionCopierInterface:
+        alias: LRH\Bundle\DimensionBundle\Dimension\Application\DimensionCopier\DimensionCopier
+        public: true
