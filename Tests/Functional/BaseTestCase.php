@@ -6,7 +6,9 @@ namespace LRH\Bundle\DimensionBundle\Tests\Functional;
 
 use Doctrine\ORM\EntityManagerInterface;
 use LRH\Bundle\DimensionBundle\Dimension\Application\DimensionCopier\DimensionCopierInterface;
+use LRH\Bundle\DimensionBundle\Dimension\Application\DimensionMover\DimensionMoverInterface;
 use LRH\Bundle\DimensionBundle\Dimension\Application\DimensionPersister\DimensionPersisterInterface;
+use LRH\Bundle\DimensionBundle\Dimension\Application\DimensionRemover\DimensionRemoverInterface;
 use LRH\Bundle\DimensionBundle\Dimension\Application\DimensionResolver\DimensionResolverInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -56,5 +58,23 @@ abstract class BaseTestCase extends KernelTestCase
         }
 
         return static::$container->get(DimensionCopierInterface::class);
+    }
+
+    protected static function getDimensionMover(): DimensionMoverInterface
+    {
+        if (!self::$booted) {
+            static::bootKernel();
+        }
+
+        return static::$container->get(DimensionMoverInterface::class);
+    }
+
+    protected static function getDimensionRemover(): DimensionRemoverInterface
+    {
+        if (!self::$booted) {
+            static::bootKernel();
+        }
+
+        return static::$container->get(DimensionRemoverInterface::class);
     }
 }

@@ -17,3 +17,11 @@ services:
     LRH\Bundle\DimensionBundle\Dimension\Application\DimensionCopier\DimensionCopierInterface:
         alias: LRH\Bundle\DimensionBundle\Dimension\Application\DimensionCopier\DimensionCopier
         public: true
+
+    LRH\Bundle\DimensionBundle\Dimension\Application\DimensionRemover\DimensionRemoverInterface:
+        alias: LRH\Bundle\DimensionBundle\Dimension\Application\DimensionRemover\DimensionRemover
+        public: true
+
+    LRH\Bundle\DimensionBundle\Dimension\Application\DimensionMover\DimensionMoverInterface:
+        alias: LRH\Bundle\DimensionBundle\Dimension\Application\DimensionMover\DimensionMover
+        public: true

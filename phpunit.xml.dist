@@ -21,10 +21,12 @@
     </filter>
 
     <php>
+        <ini name="error_reporting" value="-1"/>
         <server name="SYMFONY_PHPUNIT_VERSION" value="8.3"/>
         <env name="KERNEL_CLASS" value="LRH\Bundle\DimensionBundle\Tests\Application\Kernel"/>
         <env name="APP_ENV" value="test" force="true"/>
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak"/>
         <server name="SYMFONY_PHPUNIT_REMOVE" value="symfony/yaml"/>
+        <server name="SHELL_VERBOSITY" value="-1"/>
     </php>
 </phpunit>

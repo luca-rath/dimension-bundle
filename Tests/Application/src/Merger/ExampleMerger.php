@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LRH\Bundle\DimensionBundle\Tests\Application\Merger;
 
 use LRH\Bundle\DimensionBundle\Dimension\Application\DimensionMerger\MergerInterface;
+use LRH\Bundle\DimensionBundle\Dimension\Domain\Factory\DimensionCollectionFactoryInterface;
 use LRH\Bundle\DimensionBundle\Dimension\Domain\Model\DimensionCollectionInterface;
 use LRH\Bundle\DimensionBundle\Dimension\Domain\Model\DimensionInterface;
 use LRH\Bundle\DimensionBundle\Tests\Application\Entity\Example;
@@ -12,6 +13,13 @@ use Webmozart\Assert\Assert;
 
 class ExampleMerger implements MergerInterface
 {
+    protected DimensionCollectionFactoryInterface $dimensionCollectionFactory;
+
+    public function __construct(DimensionCollectionFactoryInterface $dimensionCollectionFactory)
+    {
+        $this->dimensionCollectionFactory = $dimensionCollectionFactory;
+    }
+
     public function merge(DimensionCollectionInterface $collection, DimensionInterface $projection): void
     {
         if (!$projection instanceof Example) {
@@ -51,25 +59,25 @@ class ExampleMerger implements MergerInterface
         Assert::allIsInstanceOf($collection, Example::class);
 
         /** @var Example $unlocalizedDimensionNoStage */
-        $unlocalizedDimensionNoStage = $collection->getSpecificDimension([
+        $unlocalizedDimensionNoStage = $this->dimensionCollectionFactory->getSpecificDimension($collection, [
             'locale' => null,
             'stage' => null,
         ]);
 
         /** @var Example $localizedDimensionNoStage */
-        $localizedDimensionNoStage = $collection->getSpecificDimension([
+        $localizedDimensionNoStage = $this->dimensionCollectionFactory->getSpecificDimension($collection, [
             'locale' => $projection->getLocale(),
             'stage' => null,
         ]);
 
         /** @var Example $unlocalizedDimension */
-        $unlocalizedDimension = $collection->getSpecificDimension([
+        $unlocalizedDimension = $this->dimensionCollectionFactory->getSpecificDimension($collection, [
             'locale' => null,
             'stage' => $projection->getStage(),
         ]);
 
         /** @var Example $localizedDimension */
-        $localizedDimension = $collection->getSpecificDimension([
+        $localizedDimension = $this->dimensionCollectionFactory->getSpecificDimension($collection, [
             'locale' => $projection->getLocale(),
             'stage' => $projection->getStage(),
         ]);
