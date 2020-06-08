@@ -61,7 +61,7 @@ class DimensionRepository implements DimensionRepositoryInterface
         return $qb->getQuery()->getResult();
     }
 
-    public function findOneByDimensionAttributes(string $dimensionClass, string $id, array $dimensionAttributes): ?DimensionInterface
+    public function findOneByDimensionAttributes(string $dimensionClass, string $id, array $dimensionAttributes): DimensionInterface
     {
         Assert::isMap($dimensionAttributes);
 

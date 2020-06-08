@@ -58,33 +58,35 @@ class ExampleMerger implements MergerInterface
         Assert::true($projection->isProjection());
         Assert::allIsInstanceOf($collection, Example::class);
 
-        /** @var Example $unlocalizedDimensionNoStage */
-        $unlocalizedDimensionNoStage = $this->dimensionCollectionFactory->getSpecificDimension($collection, [
+        $this->getSpecificDimension($collection, [
             'locale' => null,
             'stage' => null,
-        ]);
+        ])->setLocation($projection->getLocation());
 
-        /** @var Example $localizedDimensionNoStage */
-        $localizedDimensionNoStage = $this->dimensionCollectionFactory->getSpecificDimension($collection, [
+        $this->getSpecificDimension($collection, [
             'locale' => $projection->getLocale(),
             'stage' => null,
-        ]);
+        ])->setApiData($projection->getApiData());
 
-        /** @var Example $unlocalizedDimension */
-        $unlocalizedDimension = $this->dimensionCollectionFactory->getSpecificDimension($collection, [
+        $this->getSpecificDimension($collection, [
             'locale' => null,
             'stage' => $projection->getStage(),
-        ]);
+        ])->setName($projection->getName());
 
-        /** @var Example $localizedDimension */
-        $localizedDimension = $this->dimensionCollectionFactory->getSpecificDimension($collection, [
+        $this->getSpecificDimension($collection, [
             'locale' => $projection->getLocale(),
             'stage' => $projection->getStage(),
-        ]);
+        ])->setTitle($projection->getTitle());
+    }
 
-        $unlocalizedDimensionNoStage->setLocation($projection->getLocation());
-        $localizedDimensionNoStage->setApiData($projection->getApiData());
-        $unlocalizedDimension->setName($projection->getName());
-        $localizedDimension->setTitle($projection->getTitle());
+    /**
+     * @param array<string, mixed|null> $dimensionAttributes
+     */
+    protected function getSpecificDimension(DimensionCollectionInterface $dimensionCollection, array $dimensionAttributes): Example
+    {
+        /** @var Example $dimension */
+        $dimension = $this->dimensionCollectionFactory->getSpecificDimension($dimensionCollection, $dimensionAttributes);
+
+        return $dimension;
     }
 }
