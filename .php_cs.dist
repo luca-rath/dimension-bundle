@@ -1,8 +1,10 @@
 <?php
 
 $finder = PhpCsFixer\Finder::create()
-    ->exclude(['var', 'vendor'])
-    ->in(__DIR__);
+    ->files()
+    ->in(__DIR__)
+    ->exclude('vendor')
+    ->exclude('Tests/Application/var');
 
 return PhpCsFixer\Config::create()
     ->setRiskyAllowed(true)

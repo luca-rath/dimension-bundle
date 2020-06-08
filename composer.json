@@ -32,6 +32,9 @@
         "symfony/yaml": "^5.1",
         "thecodingmachine/phpstan-strict-rules": "^0.12"
     },
+    "conflict": {
+        "phpstan/phpstan": "0.12.26"
+    },
     "autoload": {
         "psr-4": {
             "LRH\\Bundle\\DimensionBundle\\": ""
@@ -77,7 +80,10 @@
         ]
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "platform": {
+            "php": "7.4"
+        }
     },
     "extra": {
         "branch-alias": {
