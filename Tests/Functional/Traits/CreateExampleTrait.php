@@ -39,7 +39,7 @@ trait CreateExampleTrait
         return $example;
     }
 
-    abstract protected function getEntityManager(): EntityManagerInterface;
+    abstract protected static function getEntityManager(): EntityManagerInterface;
 
-    abstract protected function getDimensionPersister(): DimensionPersisterInterface;
+    abstract protected static function getDimensionPersister(): DimensionPersisterInterface;
 }

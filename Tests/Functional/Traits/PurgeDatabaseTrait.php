@@ -39,7 +39,7 @@ trait PurgeDatabaseTrait
         }
     }
 
-    abstract public static function getEntityManager(): EntityManagerInterface;
+    abstract protected static function getEntityManager(): EntityManagerInterface;
 
-    abstract public static function getContainer(): ContainerInterface;
+    abstract protected static function getContainer(): ContainerInterface;
 }

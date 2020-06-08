@@ -33,18 +33,6 @@ abstract class BaseTestCase extends KernelTestCase
         parent::setUp();
     }
 
-    protected static function getEntityManager(): EntityManagerInterface
-    {
-        if (!self::$booted) {
-            static::bootKernel();
-        }
-
-        /** @var EntityManagerInterface $em */
-        $em = static::$container->get('doctrine.orm.entity_manager');
-
-        return $em;
-    }
-
     protected static function getContainer(): ContainerInterface
     {
         if (!self::$booted) {
@@ -54,48 +42,36 @@ abstract class BaseTestCase extends KernelTestCase
         return static::$container;
     }
 
+    protected static function getEntityManager(): EntityManagerInterface
+    {
+        /** @var EntityManagerInterface $em */
+        $em = static::getContainer()->get('doctrine.orm.entity_manager');
+
+        return $em;
+    }
+
     protected static function getDimensionResolver(): DimensionResolverInterface
     {
-        if (!self::$booted) {
-            static::bootKernel();
-        }
-
-        return static::$container->get(DimensionResolverInterface::class);
+        return static::getContainer()->get(DimensionResolverInterface::class);
     }
 
     protected static function getDimensionPersister(): DimensionPersisterInterface
     {
-        if (!self::$booted) {
-            static::bootKernel();
-        }
-
-        return static::$container->get(DimensionPersisterInterface::class);
+        return static::getContainer()->get(DimensionPersisterInterface::class);
     }
 
     protected static function getDimensionCopier(): DimensionCopierInterface
     {
-        if (!self::$booted) {
-            static::bootKernel();
-        }
-
-        return static::$container->get(DimensionCopierInterface::class);
+        return static::getContainer()->get(DimensionCopierInterface::class);
     }
 
     protected static function getDimensionMover(): DimensionMoverInterface
     {
-        if (!self::$booted) {
-            static::bootKernel();
-        }
-
-        return static::$container->get(DimensionMoverInterface::class);
+        return static::getContainer()->get(DimensionMoverInterface::class);
     }
 
     protected static function getDimensionRemover(): DimensionRemoverInterface
     {
-        if (!self::$booted) {
-            static::bootKernel();
-        }
-
-        return static::$container->get(DimensionRemoverInterface::class);
+        return static::getContainer()->get(DimensionRemoverInterface::class);
     }
 }
