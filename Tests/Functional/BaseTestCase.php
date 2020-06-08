@@ -10,15 +10,27 @@ use LRH\Bundle\DimensionBundle\Dimension\Application\DimensionMover\DimensionMov
 use LRH\Bundle\DimensionBundle\Dimension\Application\DimensionPersister\DimensionPersisterInterface;
 use LRH\Bundle\DimensionBundle\Dimension\Application\DimensionRemover\DimensionRemoverInterface;
 use LRH\Bundle\DimensionBundle\Dimension\Application\DimensionResolver\DimensionResolverInterface;
+use LRH\Bundle\DimensionBundle\Tests\Functional\Traits\PurgeDatabaseTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class BaseTestCase extends KernelTestCase
 {
+    use PurgeDatabaseTrait;
+
+    public static function setUpBeforeClass(): void
+    {
+        static::purgeDatabase();
+        parent::setUpBeforeClass();
+    }
+
     protected function setUp(): void
     {
         if (!self::$booted) {
             static::bootKernel();
         }
+
+        parent::setUp();
     }
 
     protected static function getEntityManager(): EntityManagerInterface
@@ -31,6 +43,15 @@ abstract class BaseTestCase extends KernelTestCase
         $em = static::$container->get('doctrine.orm.entity_manager');
 
         return $em;
+    }
+
+    protected static function getContainer(): ContainerInterface
+    {
+        if (!self::$booted) {
+            static::bootKernel();
+        }
+
+        return static::$container;
     }
 
     protected static function getDimensionResolver(): DimensionResolverInterface

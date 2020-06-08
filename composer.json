@@ -15,6 +15,7 @@
         "webmozart/assert": "^1.8"
     },
     "require-dev": {
+        "doctrine/data-fixtures": "^1.4",
         "doctrine/doctrine-bundle": "^2.1",
         "friendsofphp/php-cs-fixer": "^2.16",
         "jangregor/phpstan-prophecy": "^0.5",
