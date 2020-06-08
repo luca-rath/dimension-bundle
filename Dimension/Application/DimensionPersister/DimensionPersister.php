@@ -29,7 +29,7 @@ class DimensionPersister implements DimensionPersisterInterface
             '"$projection" must be a projection.'
         );
 
-        $dimensionCollection = $this->dimensionCollectionFactory->getDimensionCollection(
+        $dimensionCollection = $this->dimensionCollectionFactory->createDimensionCollectionFromExisting(
             \get_class($projection),
             $projection->getId(),
             $projection->getDimensionAttributes()

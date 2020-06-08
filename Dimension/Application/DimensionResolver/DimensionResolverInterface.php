@@ -16,4 +16,10 @@ interface DimensionResolverInterface
      * @throws DimensionNotFoundException
      */
     public function resolve(string $dimensionClass, string $id, array $dimensionAttributes): DimensionInterface;
+
+    /**
+     * @param class-string<DimensionInterface> $dimensionClass
+     * @param array<string, mixed> $dimensionAttributes
+     */
+    public function resolvePartial(string $dimensionClass, string $id, array $dimensionAttributes): DimensionInterface;
 }

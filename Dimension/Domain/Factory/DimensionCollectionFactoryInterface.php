@@ -13,17 +13,31 @@ interface DimensionCollectionFactoryInterface
      * @param class-string<DimensionInterface> $dimensionClass
      * @param array<string, mixed> $dimensionAttributes
      */
-    public function createDimensionCollection(string $dimensionClass, string $id, array $dimensionAttributes): DimensionCollectionInterface;
+    public function createEmptyDimensionCollection(string $dimensionClass, string $id, array $dimensionAttributes): DimensionCollectionInterface;
 
     /**
      * @param class-string<DimensionInterface> $dimensionClass
      * @param array<string, mixed> $dimensionAttributes
      */
-    public function getDimensionCollection(string $dimensionClass, string $id, array $dimensionAttributes): DimensionCollectionInterface;
+    public function createDimensionCollectionFromExisting(
+        string $dimensionClass,
+        string $id,
+        array $dimensionAttributes
+    ): DimensionCollectionInterface;
 
     /**
      * @param class-string<DimensionInterface> $dimensionClass
      * @param array<string, mixed> $dimensionAttributes
      */
     public function loadDimensionCollection(string $dimensionClass, string $id, array $dimensionAttributes): DimensionCollectionInterface;
+
+    /**
+     * @param array<string, mixed|null> $dimensionAttributes
+     */
+    public function getSpecificDimension(DimensionCollectionInterface $dimensionCollection, array $dimensionAttributes): DimensionInterface;
+
+    /**
+     * @param array<string, mixed|null> $dimensionAttributes
+     */
+    public function hasSpecificDimension(DimensionCollectionInterface $dimensionCollection, array $dimensionAttributes): bool;
 }

@@ -55,6 +55,7 @@
 
         <!-- DimensionCopier -->
         <service id="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionCopier\DimensionCopier">
+            <argument type="service" id="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionResolver\DimensionResolverInterface"/>
             <argument type="service" id="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionPersister\DimensionPersisterInterface"/>
         </service>
         <service id="LRH\Bundle\DimensionBundle\Dimension\Application\DimensionCopier\DimensionCopierInterface"

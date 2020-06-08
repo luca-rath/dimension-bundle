@@ -73,6 +73,14 @@ class DimensionRepository implements DimensionRepositoryInterface
             ->setParameter('id', $id);
 
         foreach ($dimensionAttributes as $attribute => $value) {
+            if (null === $value) {
+                $qb->andWhere(
+                    $qb->expr()->isNull('dimension.' . $attribute)
+                );
+
+                continue;
+            }
+
             $qb->andWhere(
                 $qb->expr()->eq('dimension.' . $attribute, ':' . $attribute)
             );

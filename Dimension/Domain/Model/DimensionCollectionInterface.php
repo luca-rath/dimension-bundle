@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace LRH\Bundle\DimensionBundle\Dimension\Domain\Model;
 
+use Doctrine\Common\Collections\Collection;
+
 /**
  * @extends \Traversable<int, DimensionInterface>
  */
@@ -22,7 +24,16 @@ interface DimensionCollectionInterface extends \Traversable, \Countable
     public function getDimensionAttributes(): array;
 
     /**
-     * @param array<string, mixed|null> $dimensionAttributes
+     * @return Collection<int, DimensionInterface>
+     *
+     * @internal
      */
-    public function getSpecificDimension(array $dimensionAttributes): ?DimensionInterface;
+    public function getDimensions(): Collection;
+
+    /**
+     * @param Collection<int, DimensionInterface> $dimensions
+     *
+     * @internal
+     */
+    public function setDimensions(Collection $dimensions): void;
 }

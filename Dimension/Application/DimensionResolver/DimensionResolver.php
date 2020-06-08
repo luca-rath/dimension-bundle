@@ -8,6 +8,7 @@ use LRH\Bundle\DimensionBundle\Dimension\Application\DimensionMerger\DimensionMe
 use LRH\Bundle\DimensionBundle\Dimension\Domain\Exception\DimensionNotFoundException;
 use LRH\Bundle\DimensionBundle\Dimension\Domain\Factory\DimensionCollectionFactoryInterface;
 use LRH\Bundle\DimensionBundle\Dimension\Domain\Factory\DimensionFactoryInterface;
+use LRH\Bundle\DimensionBundle\Dimension\Domain\Model\DimensionCollectionInterface;
 use LRH\Bundle\DimensionBundle\Dimension\Domain\Model\DimensionInterface;
 use Webmozart\Assert\Assert;
 
@@ -29,20 +30,46 @@ class DimensionResolver implements DimensionResolverInterface
 
     public function resolve(string $dimensionClass, string $id, array $dimensionAttributes): DimensionInterface
     {
+        $dimensionCollection = $this->loadDimensionCollection($dimensionClass, $id, $dimensionAttributes);
+
+        if (!$this->dimensionCollectionFactory->hasSpecificDimension($dimensionCollection, $dimensionAttributes)) {
+            throw new DimensionNotFoundException($dimensionClass, $id, $dimensionAttributes);
+        }
+
+        return $this->mergeDimensionCollection($dimensionCollection);
+    }
+
+    public function resolvePartial(string $dimensionClass, string $id, array $dimensionAttributes): DimensionInterface
+    {
+        $dimensionCollection = $this->loadDimensionCollection($dimensionClass, $id, $dimensionAttributes);
+
+        return $this->mergeDimensionCollection($dimensionCollection);
+    }
+
+    /**
+     * @param class-string<DimensionInterface> $dimensionClass
+     * @param array<string, mixed> $dimensionAttributes
+     */
+    protected function loadDimensionCollection(string $dimensionClass, string $id, array $dimensionAttributes): DimensionCollectionInterface
+    {
         Assert::isMap($dimensionAttributes);
         Assert::allNotNull($dimensionAttributes);
 
-        $dimensionCollection = $this->dimensionCollectionFactory->loadDimensionCollection(
+        return $this->dimensionCollectionFactory->loadDimensionCollection(
             $dimensionClass,
             $id,
             $dimensionAttributes
         );
+    }
 
-        if (null === $dimensionCollection->getSpecificDimension($dimensionAttributes)) {
-            throw new DimensionNotFoundException($dimensionClass, $id, $dimensionAttributes);
-        }
+    protected function mergeDimensionCollection(DimensionCollectionInterface $dimensionCollection): DimensionInterface
+    {
+        $projection = $this->dimensionFactory->createProjection(
+            $dimensionCollection->getDimensionClass(),
+            $dimensionCollection->getId(),
+            $dimensionCollection->getDimensionAttributes()
+        );
 
-        $projection = $this->dimensionFactory->createProjection($dimensionClass, $id, $dimensionAttributes);
         $this->dimensionMerger->merge($dimensionCollection, $projection);
 
         return $projection;

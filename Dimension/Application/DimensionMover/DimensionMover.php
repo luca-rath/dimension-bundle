@@ -22,14 +22,32 @@ class DimensionMover implements DimensionMoverInterface
         $this->dimensionRemover = $dimensionRemover;
     }
 
-    public function move(DimensionInterface $sourceProjection, array $targetDimensionAttributes): DimensionInterface
+    public function move(string $dimensionClass, string $id, array $sourceDimensionAttributes, array $targetDimensionAttributes): DimensionInterface
+    {
+        $targetProjection = $this->dimensionCopier->copy(
+            $dimensionClass,
+            $id,
+            $sourceDimensionAttributes,
+            $targetDimensionAttributes
+        );
+
+        $this->dimensionRemover->removeDimension(
+            $dimensionClass,
+            $id,
+            $sourceDimensionAttributes
+        );
+
+        return $targetProjection;
+    }
+
+    public function moveProjection(DimensionInterface $sourceProjection, array $targetDimensionAttributes): DimensionInterface
     {
         Assert::true(
             $sourceProjection->isProjection(),
             '"$sourceProjection" must be a projection.'
         );
 
-        $targetProjection = $this->dimensionCopier->copy($sourceProjection, $targetDimensionAttributes);
+        $targetProjection = $this->dimensionCopier->copyProjection($sourceProjection, $targetDimensionAttributes);
 
         $this->dimensionRemover->removeDimension(
             \get_class($sourceProjection),

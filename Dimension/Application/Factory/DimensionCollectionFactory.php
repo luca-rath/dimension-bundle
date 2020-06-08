@@ -23,7 +23,7 @@ class DimensionCollectionFactory implements DimensionCollectionFactoryInterface
         $this->dimensionRepository = $dimensionRepository;
     }
 
-    public function createDimensionCollection(
+    public function createEmptyDimensionCollection(
         string $dimensionClass,
         string $id,
         array $dimensionAttributes
@@ -31,40 +31,40 @@ class DimensionCollectionFactory implements DimensionCollectionFactoryInterface
         Assert::isMap($dimensionAttributes);
         Assert::allNotNull($dimensionAttributes);
 
-        $collection = new ArrayCollection();
+        $dimensions = [
+            $this->createDimension($dimensionClass, $id, $dimensionAttributes),
+        ];
 
-        $dimensionAttributeCombinations = $this->getDimensionAttributeCombinations($dimensionAttributes);
-        foreach ($dimensionAttributeCombinations as $specificDimensionAttributes) {
+        return $this->createSortedDimensionCollection($dimensions, $dimensionClass, $id, $dimensionAttributes);
+    }
+
+    public function createDimensionCollectionFromExisting(
+        string $dimensionClass,
+        string $id,
+        array $dimensionAttributes
+    ): DimensionCollectionInterface {
+        Assert::isMap($dimensionAttributes);
+        Assert::allNotNull($dimensionAttributes);
+
+        $existingDimensionCollection = $this->loadDimensionCollection(
+            $dimensionClass,
+            $id,
+            $dimensionAttributes
+        );
+
+        $collection = $existingDimensionCollection->getDimensions();
+        if (!$this->hasSpecificDimension($existingDimensionCollection, $dimensionAttributes)) {
             $collection->add(
-                $this->createDimension($dimensionClass, $id, $specificDimensionAttributes)
+                $this->createDimension($dimensionClass, $id, $dimensionAttributes)
             );
         }
 
-        return $this->createSortedDimensionCollection($collection, $dimensionClass, $id, $dimensionAttributes);
-    }
-
-    public function getDimensionCollection(
-        string $dimensionClass,
-        string $id,
-        array $dimensionAttributes
-    ): DimensionCollectionInterface {
-        Assert::isMap($dimensionAttributes);
-        Assert::allNotNull($dimensionAttributes);
-
-        $existingDimensionCollection = $this->loadDimensionCollection($dimensionClass, $id, $dimensionAttributes);
-        $collection = new ArrayCollection();
-
-        $dimensionAttributeCombinations = $this->getDimensionAttributeCombinations($dimensionAttributes);
-        foreach ($dimensionAttributeCombinations as $specificDimensionAttributes) {
-            $specificDimension = $existingDimensionCollection->getSpecificDimension($specificDimensionAttributes);
-            if (null === $specificDimension) {
-                $specificDimension = $this->createDimension($dimensionClass, $id, $specificDimensionAttributes);
-            }
-
-            $collection->add($specificDimension);
-        }
-
-        return $this->createSortedDimensionCollection($collection, $dimensionClass, $id, $dimensionAttributes);
+        return $this->createSortedDimensionCollection(
+            $collection->getValues(),
+            $dimensionClass,
+            $id,
+            $dimensionAttributes
+        );
     }
 
     public function loadDimensionCollection(
@@ -82,34 +82,110 @@ class DimensionCollectionFactory implements DimensionCollectionFactoryInterface
         );
 
         return $this->createSortedDimensionCollection(
-            new ArrayCollection($dimensions),
+            $dimensions,
             $dimensionClass,
             $id,
             $dimensionAttributes
         );
     }
 
+    public function hasSpecificDimension(DimensionCollectionInterface $dimensionCollection, array $dimensionAttributes): bool
+    {
+        return null !== $this->getSpecificDimensionOrNull($dimensionCollection, $dimensionAttributes);
+    }
+
+    public function getSpecificDimension(DimensionCollectionInterface $dimensionCollection, array $dimensionAttributes): DimensionInterface
+    {
+        $dimension = $this->getSpecificDimensionOrNull($dimensionCollection, $dimensionAttributes);
+        if (null !== $dimension) {
+            return $dimension;
+        }
+
+        $dimension = $this->createDimension(
+            $dimensionCollection->getDimensionClass(),
+            $dimensionCollection->getId(),
+            $dimensionAttributes
+        );
+
+        $dimensionCollection->setDimensions(
+            $this->sortCollection(
+                $dimensionCollection->getDimensions(),
+                $dimensionCollection->getDimensionAttributes()
+            )
+        );
+
+        return $dimension;
+    }
+
+    /**
+     * @param array<string, mixed|null> $dimensionAttributes
+     */
+    protected function getSpecificDimensionOrNull(DimensionCollectionInterface $dimensionCollection, array $dimensionAttributes): ?DimensionInterface
+    {
+        // Get most specific dimension
+        $dimensionAttributes = array_merge(
+            $dimensionCollection->getDimensionAttributes(),
+            $dimensionAttributes
+        );
+
+        Assert::isMap($dimensionAttributes);
+
+        $criteria = Criteria::create();
+        foreach ($dimensionAttributes as $attribute => $value) {
+            if (null === $value) {
+                $criteria->andWhere(
+                    $criteria::expr()->isNull($attribute)
+                );
+
+                continue;
+            }
+
+            $criteria->andWhere(
+                $criteria::expr()->eq($attribute, $value)
+            );
+        }
+
+        /** @var Collection<int, DimensionInterface> $collection */
+        $collection = $dimensionCollection->getDimensions()->matching($criteria);
+        $collection = $this->sortCollection($collection, $dimensionCollection->getDimensionAttributes(), 'DESC');
+
+        return $collection->first() ?: null;
+    }
+
     /**
      * @param Collection<int, DimensionInterface> $collection
-     * @param class-string<DimensionInterface> $dimensionClass
      * @param array<string, mixed> $dimensionAttributes
+     *
+     * @return Collection<int, DimensionInterface>
      */
-    protected function createSortedDimensionCollection(
-        Collection $collection,
-        string $dimensionClass,
-        string $id,
-        array $dimensionAttributes
-    ): DimensionCollectionInterface {
+    protected function sortCollection(Collection $collection, $dimensionAttributes, string $sortMethod = 'ASC'): Collection
+    {
         $criteria = Criteria::create()
             ->orderBy(
                 array_fill_keys(
                     array_keys($dimensionAttributes),
-                    'ASC'
+                    $sortMethod
                 )
             );
 
+        return $collection->matching($criteria);
+    }
+
+    /**
+     * @param DimensionInterface[] $dimensions
+     * @param class-string<DimensionInterface> $dimensionClass
+     * @param array<string, mixed> $dimensionAttributes
+     */
+    protected function createSortedDimensionCollection(
+        array $dimensions,
+        string $dimensionClass,
+        string $id,
+        array $dimensionAttributes
+    ): DimensionCollectionInterface {
+        $collection = $this->sortCollection(new ArrayCollection($dimensions), $dimensionAttributes);
+
         return new DimensionCollection(
-            $collection->matching($criteria)->getValues(),
+            $collection,
             $dimensionClass,
             $id,
             $dimensionAttributes
@@ -126,44 +202,5 @@ class DimensionCollectionFactory implements DimensionCollectionFactoryInterface
         $this->dimensionRepository->add($dimension);
 
         return $dimension;
-    }
-
-    /**
-     * @param array<string, mixed> $dimensionAttributes
-     *
-     * @return \Generator<array<string, mixed|null>>
-     */
-    protected function getDimensionAttributeCombinations(array $dimensionAttributes): \Generator
-    {
-        // Copied from https://stackoverflow.com/a/25611822/7733374
-        $comb = function ($m, $a) use (&$comb) {
-            if (!$m) {
-                yield [];
-
-                return;
-            }
-            if (!$a) {
-                return;
-            }
-            $h = $a[0];
-            $t = \array_slice($a, 1);
-            foreach ($comb($m - 1, $t) as $c) {
-                yield array_merge([$h], $c);
-            }
-            foreach ($comb($m, $t) as $c) {
-                yield $c;
-            }
-        };
-
-        $values = array_keys($dimensionAttributes);
-
-        for ($k = 0; $k <= \count($values); ++$k) {
-            foreach ($comb($k, $values) as $value) {
-                /** @var array<string, mixed> $specificDimensionAttributes */
-                $specificDimensionAttributes = array_merge($dimensionAttributes, array_fill_keys($value, null));
-
-                yield $specificDimensionAttributes;
-            }
-        }
     }
 }

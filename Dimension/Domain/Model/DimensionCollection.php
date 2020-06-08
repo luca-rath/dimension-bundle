@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace LRH\Bundle\DimensionBundle\Dimension\Domain\Model;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Doctrine\Common\Collections\Collection;
 use Webmozart\Assert\Assert;
 
 /**
@@ -13,9 +13,9 @@ use Webmozart\Assert\Assert;
 class DimensionCollection implements \IteratorAggregate, DimensionCollectionInterface
 {
     /**
-     * @var DimensionInterface[]
+     * @var Collection<int, DimensionInterface>
      */
-    protected array $dimensions;
+    protected Collection $dimensions;
 
     /**
      * @var class-string<DimensionInterface>
@@ -30,11 +30,11 @@ class DimensionCollection implements \IteratorAggregate, DimensionCollectionInte
     protected array $dimensionAttributes;
 
     /**
-     * @param DimensionInterface[] $dimensions
+     * @param Collection<int, DimensionInterface> $dimensions
      * @param class-string<DimensionInterface> $dimensionClass
      * @param array<string, mixed> $dimensionAttributes
      */
-    public function __construct(array $dimensions, string $dimensionClass, string $id, array $dimensionAttributes)
+    public function __construct(Collection $dimensions, string $dimensionClass, string $id, array $dimensionAttributes)
     {
         Assert::isMap($dimensionAttributes);
         Assert::allNotNull($dimensionAttributes);
@@ -60,40 +60,26 @@ class DimensionCollection implements \IteratorAggregate, DimensionCollectionInte
         return $this->dimensionAttributes;
     }
 
-    public function getSpecificDimension(array $dimensionAttributes): ?DimensionInterface
+    public function getDimensions(): Collection
     {
-        $dimensionAttributes = array_merge(
-            $this->getDimensionAttributes(),
-            $dimensionAttributes
-        );
+        return $this->dimensions;
+    }
 
-        Assert::isMap($dimensionAttributes);
-
-        $propertyAccessor = PropertyAccess::createPropertyAccessor();
-
-        foreach ($this->dimensions as $dimension) {
-            foreach ($dimensionAttributes as $attribute => $value) {
-                if ($value !== $propertyAccessor->getValue($dimension, $attribute)) {
-                    continue 2;
-                }
-            }
-
-            return $dimension;
-        }
-
-        return null;
+    public function setDimensions(Collection $dimensions): void
+    {
+        $this->dimensions = $dimensions;
     }
 
     /**
-     * @return \ArrayIterator<int, DimensionInterface>
+     * @return \Traversable<int, DimensionInterface>
      */
-    public function getIterator(): \ArrayIterator
+    public function getIterator(): \Traversable
     {
-        return new \ArrayIterator($this->dimensions);
+        return $this->dimensions->getIterator();
     }
 
     public function count(): int
     {
-        return $this->getIterator()->count();
+        return $this->dimensions->count();
     }
 }
