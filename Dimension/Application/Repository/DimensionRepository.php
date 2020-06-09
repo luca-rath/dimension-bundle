@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LRH\Bundle\DimensionBundle\Dimension\Application\Repository;
 
 use Doctrine\ORM\EntityManagerInterface;
+use LRH\Bundle\DimensionBundle\Dimension\Application\Util\DimensionInstantiator;
 use LRH\Bundle\DimensionBundle\Dimension\Domain\Factory\DimensionFactoryInterface;
 use LRH\Bundle\DimensionBundle\Dimension\Domain\Model\DimensionInterface;
 use LRH\Bundle\DimensionBundle\Dimension\Domain\Repository\DimensionRepositoryInterface;
@@ -23,18 +24,32 @@ class DimensionRepository implements DimensionRepositoryInterface
 
     public function create(string $dimensionClass, string $id, array $dimensionAttributes): DimensionInterface
     {
+        $instance = DimensionInstantiator::createInstance($dimensionClass);
+        $dimensionAttributes = array_merge(
+            array_fill_keys($instance::getAvailableDimensionAttributes(), null),
+            $dimensionAttributes
+        );
+
+        Assert::isMap($dimensionAttributes);
+
         return $this->dimensionFactory->createDimension($dimensionClass, $id, $dimensionAttributes);
     }
 
     public function add(DimensionInterface $dimension): void
     {
-        Assert::false($dimension->isProjection(), 'Projection cannot be persisted.');
+        Assert::false($dimension->isProjection(), 'A projection cannot be persisted.');
 
         $this->entityManager->persist($dimension);
     }
 
     public function findByDimensionAttributes(string $dimensionClass, string $id, array $dimensionAttributes): array
     {
+        $instance = DimensionInstantiator::createInstance($dimensionClass);
+        $dimensionAttributes = array_merge(
+            array_fill_keys($instance::getAvailableDimensionAttributes(), null),
+            $dimensionAttributes
+        );
+
         Assert::isMap($dimensionAttributes);
         Assert::allNotNull($dimensionAttributes);
 
@@ -63,6 +78,12 @@ class DimensionRepository implements DimensionRepositoryInterface
 
     public function findOneByDimensionAttributes(string $dimensionClass, string $id, array $dimensionAttributes): DimensionInterface
     {
+        $instance = DimensionInstantiator::createInstance($dimensionClass);
+        $dimensionAttributes = array_merge(
+            array_fill_keys($instance::getAvailableDimensionAttributes(), null),
+            $dimensionAttributes
+        );
+
         Assert::isMap($dimensionAttributes);
 
         $qb = $this->entityManager->createQueryBuilder();

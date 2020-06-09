@@ -25,7 +25,7 @@ class DimensionMerger implements DimensionMergerInterface
 
     public function merge(DimensionCollectionInterface $collection, DimensionInterface $projection): void
     {
-        Assert::true($projection->isProjection(), 'Argument "$projection" needs to be a projection.');
+        Assert::true($projection->isProjection(), '"$projection" needs to be a projection.');
 
         /** @var MergerInterface $merger */
         foreach ($this->mergers as $merger) {
@@ -35,7 +35,7 @@ class DimensionMerger implements DimensionMergerInterface
 
     public function unmerge(DimensionInterface $projection, DimensionCollectionInterface $collection): void
     {
-        Assert::true($projection->isProjection(), 'Argument "$projection" needs to be a projection.');
+        Assert::true($projection->isProjection(), '"$projection" needs to be a projection.');
 
         /** @var MergerInterface $merger */
         foreach ($this->mergers as $merger) {

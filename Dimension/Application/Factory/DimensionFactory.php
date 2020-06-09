@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LRH\Bundle\DimensionBundle\Dimension\Application\Factory;
 
+use LRH\Bundle\DimensionBundle\Dimension\Application\Util\DimensionInstantiator;
 use LRH\Bundle\DimensionBundle\Dimension\Domain\Factory\DimensionFactoryInterface;
 use LRH\Bundle\DimensionBundle\Dimension\Domain\Model\DimensionInterface;
 use Webmozart\Assert\Assert;
@@ -15,14 +16,19 @@ class DimensionFactory implements DimensionFactoryInterface
         string $id,
         array $dimensionAttributes
     ): DimensionInterface {
+        $instance = DimensionInstantiator::createInstance($dimensionClass);
+        $dimensionAttributes = array_merge(
+            array_fill_keys($instance::getAvailableDimensionAttributes(), null),
+            $dimensionAttributes
+        );
+
         Assert::isMap($dimensionAttributes);
 
-        $instance = static::createDimensionInstance($dimensionClass);
         $dimension = $instance::create($id, $dimensionAttributes);
 
         Assert::false(
             $dimension->isProjection(),
-            sprintf('"%s::create()" is not allowed to return a projection.', \get_class($instance))
+            sprintf('"%s::create()" must not return a projection.', $dimensionClass)
         );
 
         return $dimension;
@@ -33,30 +39,22 @@ class DimensionFactory implements DimensionFactoryInterface
         string $id,
         array $dimensionAttributes
     ): DimensionInterface {
+        $instance = DimensionInstantiator::createInstance($dimensionClass);
+        $dimensionAttributes = array_merge(
+            array_fill_keys($instance::getAvailableDimensionAttributes(), null),
+            $dimensionAttributes
+        );
+
         Assert::isMap($dimensionAttributes);
         Assert::allNotNull($dimensionAttributes);
 
-        $instance = static::createDimensionInstance($dimensionClass);
-        $dimension = $instance::createProjection($id, $dimensionAttributes);
+        $projection = $instance::createProjection($id, $dimensionAttributes);
 
         Assert::true(
-            $dimension->isProjection(),
-            sprintf('"%s::createProjection()" needs to return a projection.', \get_class($instance))
+            $projection->isProjection(),
+            sprintf('"%s::createProjection()" needs to return a projection.', $dimensionClass)
         );
 
-        return $dimension;
-    }
-
-    /**
-     * @param class-string<DimensionInterface> $dimensionClass
-     */
-    protected function createDimensionInstance(string $dimensionClass): DimensionInterface
-    {
-        $reflClass = new \ReflectionClass($dimensionClass);
-
-        /** @var DimensionInterface $instance */
-        $instance = $reflClass->newInstanceWithoutConstructor();
-
-        return $instance;
+        return $projection;
     }
 }
