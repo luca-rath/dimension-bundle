@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LRH\Bundle\DimensionBundle\Dimension\Application\DimensionResolver;
 
 use LRH\Bundle\DimensionBundle\Dimension\Application\DimensionMerger\DimensionMergerInterface;
+use LRH\Bundle\DimensionBundle\Dimension\Application\Util\DimensionInstantiator;
 use LRH\Bundle\DimensionBundle\Dimension\Domain\Exception\DimensionNotFoundException;
 use LRH\Bundle\DimensionBundle\Dimension\Domain\Factory\DimensionCollectionFactoryInterface;
 use LRH\Bundle\DimensionBundle\Dimension\Domain\Factory\DimensionFactoryInterface;
@@ -52,6 +53,12 @@ class DimensionResolver implements DimensionResolverInterface
      */
     protected function loadDimensionCollection(string $dimensionClass, string $id, array $dimensionAttributes): DimensionCollectionInterface
     {
+        $instance = DimensionInstantiator::createInstance($dimensionClass);
+        $dimensionAttributes = array_merge(
+            array_fill_keys($instance::getAvailableDimensionAttributes(), null),
+            $dimensionAttributes
+        );
+
         Assert::isMap($dimensionAttributes);
         Assert::allNotNull($dimensionAttributes);
 

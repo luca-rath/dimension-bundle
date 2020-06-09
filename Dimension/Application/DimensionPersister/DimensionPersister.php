@@ -24,10 +24,7 @@ class DimensionPersister implements DimensionPersisterInterface
 
     public function persist(DimensionInterface $projection): void
     {
-        Assert::true(
-            $projection->isProjection(),
-            '"$projection" must be a projection.'
-        );
+        Assert::true($projection->isProjection(), '"$projection" needs to be a projection.');
 
         $dimensionCollection = $this->dimensionCollectionFactory->createDimensionCollectionFromExisting(
             \get_class($projection),

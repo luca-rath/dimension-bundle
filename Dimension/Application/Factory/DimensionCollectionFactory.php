@@ -7,6 +7,7 @@ namespace LRH\Bundle\DimensionBundle\Dimension\Application\Factory;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
+use LRH\Bundle\DimensionBundle\Dimension\Application\Util\DimensionInstantiator;
 use LRH\Bundle\DimensionBundle\Dimension\Domain\Factory\DimensionCollectionFactoryInterface;
 use LRH\Bundle\DimensionBundle\Dimension\Domain\Model\DimensionCollection;
 use LRH\Bundle\DimensionBundle\Dimension\Domain\Model\DimensionCollectionInterface;
@@ -28,6 +29,12 @@ class DimensionCollectionFactory implements DimensionCollectionFactoryInterface
         string $id,
         array $dimensionAttributes
     ): DimensionCollectionInterface {
+        $instance = DimensionInstantiator::createInstance($dimensionClass);
+        $dimensionAttributes = array_merge(
+            array_fill_keys($instance::getAvailableDimensionAttributes(), null),
+            $dimensionAttributes
+        );
+
         Assert::isMap($dimensionAttributes);
         Assert::allNotNull($dimensionAttributes);
 
@@ -43,6 +50,12 @@ class DimensionCollectionFactory implements DimensionCollectionFactoryInterface
         string $id,
         array $dimensionAttributes
     ): DimensionCollectionInterface {
+        $instance = DimensionInstantiator::createInstance($dimensionClass);
+        $dimensionAttributes = array_merge(
+            array_fill_keys($instance::getAvailableDimensionAttributes(), null),
+            $dimensionAttributes
+        );
+
         Assert::isMap($dimensionAttributes);
         Assert::allNotNull($dimensionAttributes);
 
@@ -72,6 +85,12 @@ class DimensionCollectionFactory implements DimensionCollectionFactoryInterface
         string $id,
         array $dimensionAttributes
     ): DimensionCollectionInterface {
+        $instance = DimensionInstantiator::createInstance($dimensionClass);
+        $dimensionAttributes = array_merge(
+            array_fill_keys($instance::getAvailableDimensionAttributes(), null),
+            $dimensionAttributes
+        );
+
         Assert::isMap($dimensionAttributes);
         Assert::allNotNull($dimensionAttributes);
 

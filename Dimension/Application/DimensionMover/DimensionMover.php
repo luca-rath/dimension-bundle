@@ -7,7 +7,6 @@ namespace LRH\Bundle\DimensionBundle\Dimension\Application\DimensionMover;
 use LRH\Bundle\DimensionBundle\Dimension\Application\DimensionCopier\DimensionCopierInterface;
 use LRH\Bundle\DimensionBundle\Dimension\Application\DimensionRemover\DimensionRemoverInterface;
 use LRH\Bundle\DimensionBundle\Dimension\Domain\Model\DimensionInterface;
-use Webmozart\Assert\Assert;
 
 class DimensionMover implements DimensionMoverInterface
 {
@@ -42,11 +41,6 @@ class DimensionMover implements DimensionMoverInterface
 
     public function moveProjection(DimensionInterface $sourceProjection, array $targetDimensionAttributes): DimensionInterface
     {
-        Assert::true(
-            $sourceProjection->isProjection(),
-            '"$sourceProjection" must be a projection.'
-        );
-
         $targetProjection = $this->dimensionCopier->copyProjection($sourceProjection, $targetDimensionAttributes);
 
         $this->dimensionRemover->removeDimension(
