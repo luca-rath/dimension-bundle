@@ -20,6 +20,6 @@ parameters:
         console_application_loader: Tests/phpstan/console-application.php
     doctrine:
         objectManagerLoader: Tests/phpstan/object-manager.php
-    autoload_files:
+    bootstrapFiles:
         - vendor/bin/.phpunit/phpunit-8.3-0/vendor/autoload.php
         - vendor/autoload.php
